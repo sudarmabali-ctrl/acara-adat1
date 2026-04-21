@@ -2,53 +2,129 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Acara Adat</title>
+<title>Pembukuan Acara Adat</title>
+
 <style>
-body {font-family: Arial; padding: 15px;}
-input, textarea, button {width: 100%; margin: 5px 0; padding: 10px;}
-button {background: green; color: white;}
-.card {background: #f4f4f4; padding: 10px; margin-top: 10px;}
+body { font-family: Arial; padding: 15px; background:#f4f4f4; }
+h2 { background: orange; padding:10px; }
+input, select, button { width:100%; padding:10px; margin:5px 0; }
+button { background: green; color:white; border:none; }
+.card { background:white; padding:10px; margin:10px 0; border-radius:8px; }
+.total { background:lightgreen; padding:10px; font-weight:bold; }
+.hapus { background:red; }
 </style>
 </head>
 
 <body>
 
-<h2>Input Acara Adat</h2>
+<h1>📊 Pembukuan Acara Adat</h1>
 
-<input id="nama" placeholder="Nama Acara">
-<input type="date" id="tanggal">
-<input id="lokasi" placeholder="Lokasi">
-<textarea id="ket" placeholder="Keterangan"></textarea>
+<h2>PEMASUKAN</h2>
+<select id="sumber">
+<option>Iuran Krama</option>
+<option>Dana Desa</option>
+<option>Punia</option>
+<option>Lain-lain</option>
+</select>
+<input id="uraianMasuk" placeholder="Uraian">
+<input id="jumlahMasuk" type="number" placeholder="Jumlah">
+<button onclick="tambahMasuk()">Tambah Pemasukan</button>
 
-<button onclick="simpan()">Simpan</button>
+<div id="dataMasuk"></div>
+<div class="total" id="totalMasuk"></div>
 
-<div id="data"></div>
+<h2>PENGELUARAN</h2>
+<select id="jenis">
+<option>Upacara & Upakara</option>
+<option>Transportasi</option>
+<option>Kesenian</option>
+<option>Konsumsi</option>
+<option>Pesantian</option>
+<option>Dokumentasi</option>
+<option>Keamanan</option>
+<option>Perlengkapan</option>
+<option>Humas/Tamu</option>
+<option>Kerohanian</option>
+<option>Engineering</option>
+<option>Penggalian Dana</option>
+<option>Pengerahan Massa</option>
+<option>Kebersihan</option>
+</select>
+<input id="uraianKeluar" placeholder="Uraian">
+<input id="jumlahKeluar" type="number" placeholder="Jumlah">
+<button onclick="tambahKeluar()">Tambah Pengeluaran</button>
+
+<div id="dataKeluar"></div>
+<div class="total" id="totalKeluar"></div>
+
+<h2>REKAP GLOBAL</h2>
+<div class="total" id="rekap"></div>
 
 <script>
-let acara = JSON.parse(localStorage.getItem("acara")) || [];
-
-function tampil() {
-  let isi = "";
-  acara.forEach(a => {
-    isi += `<div class="card">
-      <b>${a.nama}</b><br>
-      ${a.tanggal}<br>
-      ${a.lokasi}<br>
-      ${a.ket}
-    </div>`;
-  });
-  document.getElementById("data").innerHTML = isi;
-}
+let masuk = JSON.parse(localStorage.getItem("masuk")) || [];
+let keluar = JSON.parse(localStorage.getItem("keluar")) || [];
 
 function simpan() {
-  acara.push({
-    nama: nama.value,
-    tanggal: tanggal.value,
-    lokasi: lokasi.value,
-    ket: ket.value
+  localStorage.setItem("masuk", JSON.stringify(masuk));
+  localStorage.setItem("keluar", JSON.stringify(keluar));
+}
+
+function tambahMasuk() {
+  masuk.push({
+    sumber: sumber.value,
+    uraian: uraianMasuk.value,
+    jumlah: Number(jumlahMasuk.value)
   });
-  localStorage.setItem("acara", JSON.stringify(acara));
-  tampil();
+  simpan(); tampil();
+}
+
+function tambahKeluar() {
+  keluar.push({
+    jenis: jenis.value,
+    uraian: uraianKeluar.value,
+    jumlah: Number(jumlahKeluar.value)
+  });
+  simpan(); tampil();
+}
+
+function hapusMasuk(i){
+  masuk.splice(i,1);
+  simpan(); tampil();
+}
+
+function hapusKeluar(i){
+  keluar.splice(i,1);
+  simpan(); tampil();
+}
+
+function tampil(){
+  let tm=0, tk=0;
+
+  dataMasuk.innerHTML="";
+  masuk.forEach((d,i)=>{
+    tm+=d.jumlah;
+    dataMasuk.innerHTML += `
+    <div class="card">
+    ${d.sumber} - ${d.uraian}<br>
+    Rp ${d.jumlah}
+    <button class="hapus" onclick="hapusMasuk(${i})">Hapus</button>
+    </div>`;
+  });
+
+  dataKeluar.innerHTML="";
+  keluar.forEach((d,i)=>{
+    tk+=d.jumlah;
+    dataKeluar.innerHTML += `
+    <div class="card">
+    ${d.jenis} - ${d.uraian}<br>
+    Rp ${d.jumlah}
+    <button class="hapus" onclick="hapusKeluar(${i})">Hapus</button>
+    </div>`;
+  });
+
+  totalMasuk.innerHTML = "Total Pemasukan: Rp " + tm;
+  totalKeluar.innerHTML = "Total Pengeluaran: Rp " + tk;
+  rekap.innerHTML = "Saldo: Rp " + (tm - tk);
 }
 
 tampil();
