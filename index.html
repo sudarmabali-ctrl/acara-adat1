@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acara Adat</title>
+<style>
+body {font-family: Arial; padding: 15px;}
+input, textarea, button {width: 100%; margin: 5px 0; padding: 10px;}
+button {background: green; color: white;}
+.card {background: #f4f4f4; padding: 10px; margin-top: 10px;}
+</style>
+</head>
+
+<body>
+
+<h2>Input Acara Adat</h2>
+
+<input id="nama" placeholder="Nama Acara">
+<input type="date" id="tanggal">
+<input id="lokasi" placeholder="Lokasi">
+<textarea id="ket" placeholder="Keterangan"></textarea>
+
+<button onclick="simpan()">Simpan</button>
+
+<div id="data"></div>
+
+<script>
+let acara = JSON.parse(localStorage.getItem("acara")) || [];
+
+function tampil() {
+  let isi = "";
+  acara.forEach(a => {
+    isi += `<div class="card">
+      <b>${a.nama}</b><br>
+      ${a.tanggal}<br>
+      ${a.lokasi}<br>
+      ${a.ket}
+    </div>`;
+  });
+  document.getElementById("data").innerHTML = isi;
+}
+
+function simpan() {
+  acara.push({
+    nama: nama.value,
+    tanggal: tanggal.value,
+    lokasi: lokasi.value,
+    ket: ket.value
+  });
+  localStorage.setItem("acara", JSON.stringify(acara));
+  tampil();
+}
+
+tampil();
+</script>
+
+</body>
+</html>
